@@ -15,6 +15,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     //api call kore user er data ta ante pari
     const fetchMe = async () => {
       setIsLoading(true);
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const response = await api.get("/auth/me");
         console.log(response.data);
@@ -24,6 +31,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       } catch (error) {
         console.log(error);
+        // Clear invalid token
+        localStorage.removeItem("token");
       } finally {
         setIsLoading(false);
       }
@@ -44,10 +53,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           console.log("Socket Connected:", socketInstance.id);
         });
 
-        socketInstance.on("notice:new", (data) => {
-          console.log("New notice received:", data);
-        });
-
         socketInstance.on("connect_error", (error) => {
           console.error("Socket connection error:", error);
         });
@@ -62,16 +67,15 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     return () => {
       socketInstance.off("connect");
-      socketInstance.off("notice:new");
       socketInstance.off("connect_error");
     };
   }, [isAuthenticated, user]);
 
   const login = ({ token, user }: { token: string; user: IFaculty }) => {
     if (token) {
-      setIsAuthenticated(true);
       localStorage.setItem("token", token);
       console.log("Token stored in localStorage:", token);
+      setIsAuthenticated(true);
     }
 
     if (user) {
