@@ -38,6 +38,7 @@ const LoginPage: React.FC = () => {
     try {
       const response = await api.post("/auth/login", { email, password });
       const { token, user } = response.data.result;
+      console.log("Login response:", response.data.result);
       onLogin({ token, user });
       navigate("/dashboard");
     } catch (error) {
@@ -94,9 +95,7 @@ const LoginPage: React.FC = () => {
             <MdLock className="h-7 w-7 text-white" />
           </div>
           <h2 className="text-3xl font-bold text-gray-800">Welcome Back</h2>
-          <p className="text-gray-500 mt-1">
-            Sign in to continue your journey
-          </p>
+          <p className="text-gray-500 mt-1">Sign in to continue your journey</p>
         </div>
 
         {/* Form Card */}
@@ -162,10 +161,7 @@ const LoginPage: React.FC = () => {
             {/* Remember / Forgot */}
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="accent-blue-500 h-4 w-4"
-                />
+                <input type="checkbox" className="accent-blue-500 h-4 w-4" />
                 Remember me
               </label>
               <Link
@@ -197,14 +193,14 @@ const LoginPage: React.FC = () => {
           <button className="w-full flex items-center justify-center gap-2 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700">
             <FcGoogle className="w-5 h-5" />
             Continue with Google
-            </button>
+          </button>
 
           {/* Footer */}
           <p className="text-gray-500 text-sm mt-6 text-center">
             Don't have an account?{" "}
             <span
-            onClick={() => (window.location.href = "/signup")}
-            className="text-blue-500 hover:underline font-medium cursor-pointer"
+              onClick={() => (window.location.href = "/signup")}
+              className="text-blue-500 hover:underline font-medium cursor-pointer"
             >
               Sign up
             </span>
