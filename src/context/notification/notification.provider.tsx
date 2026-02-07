@@ -3,6 +3,7 @@ import notificationContext from "./notification.context";
 import type { INotification } from "../../@types/interface/notification.interface";
 import socketInstance from "../../config/socket.config";
 import { useAuthContext } from "../auth/useAuthContext";
+import { notificationAPI } from "../../utils/api/notification.api";
 
 const MAX_NOTIFICATIONS = 50; // Limit stored notifications
 
@@ -10,10 +11,42 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [notifications, setNotifications] = useState<INotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { isAuthenticated } = useAuthContext();
 
-  // Calculate unread count
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  // Fetch notifications from backend
+  const fetchNotifications = useCallback(async () => {
+    if (!isAuthenticated) return;
+
+    setIsLoading(true);
+    try {
+      const {
+        notifications: fetchedNotifications,
+        unreadCount: fetchedUnreadCount,
+      } = await notificationAPI.getAllNotifications({
+        page: 1,
+        limit: MAX_NOTIFICATIONS,
+      });
+
+      setNotifications(fetchedNotifications);
+      setUnreadCount(fetchedUnreadCount);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  // Load notifications on mount/auth change
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNotifications();
+    } else {
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+  }, [isAuthenticated, fetchNotifications]);
 
   // Add new notification
   const addNotification = useCallback((notification: INotification) => {
@@ -22,41 +55,106 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
       // Keep only the latest MAX_NOTIFICATIONS
       return updated.slice(0, MAX_NOTIFICATIONS);
     });
+    setUnreadCount((prev) => prev + 1);
   }, []);
 
   // Mark notification as read
-  const markAsRead = useCallback((notificationId: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)),
-    );
+  const markAsRead = useCallback(async (notificationId: string) => {
+    try {
+      // Optimistically update UI
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)),
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+
+      // Call backend API
+      await notificationAPI.markAsRead(notificationId);
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      // Revert optimistic update on error
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notificationId ? { ...n, read: false } : n)),
+      );
+      setUnreadCount((prev) => prev + 1);
+    }
   }, []);
 
   // Mark all as read
-  const markAllAsRead = useCallback(() => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  }, []);
+  const markAllAsRead = useCallback(async () => {
+    try {
+      // Optimistically update UI
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      const previousUnreadCount = unreadCount;
+      setUnreadCount(0);
+
+      // Call backend API
+      await notificationAPI.markAllAsRead();
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      // Refresh from backend on error
+      fetchNotifications();
+    }
+  }, [unreadCount, fetchNotifications]);
 
   // Remove notification
-  const removeNotification = useCallback((notificationId: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
-  }, []);
+  const removeNotification = useCallback(
+    async (notificationId: string) => {
+      try {
+        const notificationToRemove = notifications.find(
+          (n) => n.id === notificationId,
+        );
+
+        // Optimistically update UI
+        setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+        if (notificationToRemove && !notificationToRemove.read) {
+          setUnreadCount((prev) => Math.max(0, prev - 1));
+        }
+
+        // Call backend API
+        await notificationAPI.deleteNotification(notificationId);
+      } catch (error) {
+        console.error("Error deleting notification:", error);
+        // Refresh from backend on error
+        fetchNotifications();
+      }
+    },
+    [notifications, fetchNotifications],
+  );
 
   // Clear all notifications
-  const clearAll = useCallback(() => {
-    setNotifications([]);
-  }, []);
+  const clearAll = useCallback(async () => {
+    try {
+      // For clearing all, we need to delete each notification
+      const deletePromises = notifications.map((n) =>
+        notificationAPI.deleteNotification(n.id),
+      );
+
+      // Optimistically update UI
+      setNotifications([]);
+      setUnreadCount(0);
+
+      // Call backend API
+      await Promise.all(deletePromises);
+    } catch (error) {
+      console.error("Error clearing all notifications:", error);
+      // Refresh from backend on error
+      fetchNotifications();
+    }
+  }, [notifications, fetchNotifications]);
 
   // Listen to socket events for notifications
   useEffect(() => {
     if (!isAuthenticated) {
       // Clear notifications on logout
       setNotifications([]);
+      setUnreadCount(0);
       return;
     }
 
     // Handle new notice notifications
     const handleNewNotice = (data: unknown) => {
       const noticeData = data as {
+        _id?: string;
         id?: string;
         title?: string;
         message?: string;
@@ -67,7 +165,7 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
       };
 
       const notification: INotification = {
-        id: noticeData.id || `notice-${Date.now()}`,
+        id: noticeData._id || noticeData.id || `notice-${Date.now()}`,
         type: "notice",
         title: noticeData.title || "New Notice",
         message: noticeData.message || noticeData.content || "",
@@ -75,7 +173,7 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
         read: false,
         priority: noticeData.priority || "medium",
         metadata: {
-          noticeId: noticeData.id,
+          noticeId: noticeData._id || noticeData.id,
           link: noticeData.link,
           ...noticeData,
         },
@@ -87,6 +185,7 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
     // Handle new event notifications
     const handleNewEvent = (data: unknown) => {
       const eventData = data as {
+        _id?: string;
         id?: string;
         title?: string;
         description?: string;
@@ -96,7 +195,7 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
       };
 
       const notification: INotification = {
-        id: eventData.id || `event-${Date.now()}`,
+        id: eventData._id || eventData.id || `event-${Date.now()}`,
         type: "event",
         title: eventData.title || "New Event",
         message: eventData.description || "",
@@ -104,7 +203,7 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
         read: false,
         priority: eventData.priority || "medium",
         metadata: {
-          eventId: eventData.id,
+          eventId: eventData._id || eventData.id,
           eventDate: eventData.eventDate,
           ...eventData,
         },
@@ -116,6 +215,7 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
     // Handle announcement notifications
     const handleNewAnnouncement = (data: unknown) => {
       const announcementData = data as {
+        _id?: string;
         id?: string;
         title?: string;
         message?: string;
@@ -124,7 +224,10 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
       };
 
       const notification: INotification = {
-        id: announcementData.id || `announcement-${Date.now()}`,
+        id:
+          announcementData._id ||
+          announcementData.id ||
+          `announcement-${Date.now()}`,
         type: "announcement",
         title: announcementData.title || "New Announcement",
         message: announcementData.message || "",
@@ -155,11 +258,13 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         notifications,
         unreadCount,
+        isLoading,
         addNotification,
         markAsRead,
         markAllAsRead,
         removeNotification,
         clearAll,
+        refreshNotifications: fetchNotifications,
       }}
     >
       {children}

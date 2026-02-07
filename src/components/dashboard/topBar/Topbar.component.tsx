@@ -11,6 +11,8 @@ import useDashboardContext from "../../../context/dashboard/useDashboardContext"
 import { useAuthContext } from "../../../context/auth/useAuthContext";
 import { useNavigate } from "react-router";
 import api from "../../../config/axios.config";
+import { useNotificationContext } from "../../../context/notification/useNotificationContext";
+import NotificationPanel from "../../notification/NotificationPanel";
 
 const Topbar = ({
   isOpen,
@@ -21,11 +23,14 @@ const Topbar = ({
 }) => {
   const { pageName } = useDashboardContext();
   const { user, onLogout } = useAuthContext();
+  const { unreadCount } = useNotificationContext();
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const notificationRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -33,6 +38,12 @@ const Topbar = ({
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsDropdownOpen(false);
+      }
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
+        setIsNotificationOpen(false);
       }
     };
 
@@ -75,19 +86,40 @@ const Topbar = ({
       {/* Right Section - Notifications and User Profile */}
       <div className="flex items-center gap-4">
         {/* Notifications */}
-        <button
-          className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-          aria-label="Notifications"
-        >
-          <FiBell size={20} />
-          {/* Notification Badge */}
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
+        <div className="relative" ref={notificationRef}>
+          <button
+            onClick={() => {
+              setIsNotificationOpen(!isNotificationOpen);
+              setIsDropdownOpen(false);
+            }}
+            className={`relative p-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 ${
+              isNotificationOpen ? "bg-gray-100 text-gray-900" : ""
+            }`}
+            aria-label="Notifications"
+          >
+            <FiBell size={20} />
+            {/* Notification Badge */}
+            {unreadCount > 0 && (
+              <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold px-1 shadow-sm">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </button>
+
+          {/* Notification Panel */}
+          <NotificationPanel
+            isOpen={isNotificationOpen}
+            onClose={() => setIsNotificationOpen(false)}
+          />
+        </div>
 
         {/* User Profile Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            onClick={() => {
+              setIsDropdownOpen(!isDropdownOpen);
+              setIsNotificationOpen(false);
+            }}
             className="flex items-center gap-3 p-2 pr-3 hover:bg-gray-50 rounded-lg transition-colors duration-200 border border-gray-200"
           >
             {/* Avatar */}
