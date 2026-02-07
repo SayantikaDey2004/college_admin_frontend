@@ -84,7 +84,6 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       // Optimistically update UI
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-      const previousUnreadCount = unreadCount;
       setUnreadCount(0);
 
       // Call backend API
@@ -94,7 +93,7 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
       // Refresh from backend on error
       fetchNotifications();
     }
-  }, [unreadCount, fetchNotifications]);
+  }, [fetchNotifications]);
 
   // Remove notification
   const removeNotification = useCallback(
@@ -159,9 +158,14 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
         title?: string;
         message?: string;
         content?: string;
+        timestamp?: string;
         createdAt?: string;
         priority?: "low" | "medium" | "high";
-        link?: string;
+        metadata?: {
+          noticeId?: string;
+          link?: string;
+          [key: string]: unknown;
+        };
       };
 
       const notification: INotification = {
@@ -169,13 +173,15 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
         type: "notice",
         title: noticeData.title || "New Notice",
         message: noticeData.message || noticeData.content || "",
-        timestamp: new Date(noticeData.createdAt || Date.now()),
+        timestamp: new Date(
+          noticeData.timestamp || noticeData.createdAt || Date.now(),
+        ),
         read: false,
         priority: noticeData.priority || "medium",
         metadata: {
-          noticeId: noticeData._id || noticeData.id,
-          link: noticeData.link,
-          ...noticeData,
+          noticeId: noticeData.metadata?.noticeId,
+          link: noticeData.metadata?.link,
+          ...noticeData.metadata,
         },
       };
       addNotification(notification);
@@ -188,24 +194,34 @@ const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({
         _id?: string;
         id?: string;
         title?: string;
+        message?: string;
         description?: string;
+        timestamp?: string;
         createdAt?: string;
         priority?: "low" | "medium" | "high";
-        eventDate?: string;
+        metadata?: {
+          eventId?: string;
+          eventDate?: string;
+          link?: string;
+          [key: string]: unknown;
+        };
       };
 
       const notification: INotification = {
         id: eventData._id || eventData.id || `event-${Date.now()}`,
         type: "event",
         title: eventData.title || "New Event",
-        message: eventData.description || "",
-        timestamp: new Date(eventData.createdAt || Date.now()),
+        message: eventData.message || eventData.description || "",
+        timestamp: new Date(
+          eventData.timestamp || eventData.createdAt || Date.now(),
+        ),
         read: false,
         priority: eventData.priority || "medium",
         metadata: {
-          eventId: eventData._id || eventData.id,
-          eventDate: eventData.eventDate,
-          ...eventData,
+          eventId: eventData.metadata?.eventId,
+          eventDate: eventData.metadata?.eventDate,
+          link: eventData.metadata?.link,
+          ...eventData.metadata,
         },
       };
       addNotification(notification);

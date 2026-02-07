@@ -18,24 +18,24 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   const getNavigationUrl = (): string | null => {
     const { type, metadata } = notification;
 
-    // Check if custom link exists in metadata
+    // Check if custom link exists in metadata (preferred)
     if (metadata?.link) {
       return metadata.link as string;
     }
 
-    // Navigate based on notification type
+    // Fallback: Navigate based on notification type and IDs
     switch (type) {
-      // case "notice":
-      //   if (metadata?.noticeId) {
-      //     return `/notices/${metadata.noticeId}`;
-      //   }
-      //   return "/notices/list";
+      case "notice":
+        if (metadata?.noticeId) {
+          return `/notices/${metadata.noticeId}`;
+        }
+        return "/notices/list";
 
-      // case "event":
-      //   if (metadata?.eventId) {
-      //     return `/events/${metadata.eventId}`;
-      //   }
-      //   return "/events/list";
+      case "event":
+        if (metadata?.eventId) {
+          return `/events/${metadata.eventId}`;
+        }
+        return "/events/list";
 
       case "announcement":
         // Announcements might not have specific pages, stay on current
