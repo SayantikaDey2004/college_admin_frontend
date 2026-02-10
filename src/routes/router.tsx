@@ -17,11 +17,10 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import NotFoundPage from "../pages/others/404";
 import DashboardProvider from "../context/dashboard/dashboard.provider";
 import ContactUsPage from "../pages/contact/contactUs.page";
-import SignupPage from "../pages/auth/signup.pase";
 import MyProfilePage from "../pages/profile/profile.page";
 import SettingsPage from "../pages/settings/settings.page";
-import DashboardPage from "../context/dashboard/dashboard.page";
 import PermissionPage from "../pages/permission/permission.page";
+import ForgotPasswordPage from "../pages/auth/forgot_password";
 
 
 
@@ -38,10 +37,10 @@ const Router = createBrowserRouter([
       />
     ),
     children: [
-      {
+   /*   {
         path: "dashboard", 
         element: <DashboardPage />,
-      },
+      },*/
       {
         path: "faculty",
         children: [
@@ -146,10 +145,9 @@ const Router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    path: "/signup",
-    element: <SignupPage />,
+    path: "/forgot-password",
+    element: <ForgotPasswordPage />,
   },
-
   {
     path: "*",
     element: <NotFoundPage />,

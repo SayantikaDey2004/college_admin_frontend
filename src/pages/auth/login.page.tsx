@@ -175,7 +175,7 @@ const LoginPage: React.FC = () => {
             {/* Remember / Forgot */}
             <div className="flex items-center justify-between text-sm">
               <Link
-                to="#"
+                to="/forgot-password"
                 className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-all"
               >
                 Forgot password?
