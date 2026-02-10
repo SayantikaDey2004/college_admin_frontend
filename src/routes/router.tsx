@@ -21,6 +21,7 @@ import MyProfilePage from "../pages/profile/profile.page";
 import SettingsPage from "../pages/settings/settings.page";
 import PermissionPage from "../pages/permission/permission.page";
 import ForgotPasswordPage from "../pages/auth/forgot_password";
+import ResetPasswordPage from "../pages/auth/reset_password";
 
 
 
@@ -147,6 +148,10 @@ const Router = createBrowserRouter([
   {
     path: "/forgot-password",
     element: <ForgotPasswordPage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
   },
   {
     path: "*",
