@@ -4,7 +4,6 @@ import { MdEmail, MdLock } from "react-icons/md";
 import api from "../../config/axios.config";
 import { useAuthContext } from "../../context/auth/useAuthContext";
 import { Link, useNavigate } from "react-router";
-import { FcGoogle } from "react-icons/fc";
 
 const LoginPage: React.FC = () => {
   const { onLogin, isAuthenticated } = useAuthContext();
@@ -175,10 +174,6 @@ const LoginPage: React.FC = () => {
 
             {/* Remember / Forgot */}
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 text-gray-600 cursor-pointer hover:text-gray-800 transition-colors">
-                <input type="checkbox" className="accent-blue-600 h-4 w-4 cursor-pointer" />
-                Remember me
-              </label>
               <Link
                 to="#"
                 className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-all"
@@ -211,27 +206,10 @@ const LoginPage: React.FC = () => {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">New to our platform?</span>
-            </div>
           </div>
 
-          {/* Footer */}
-          <p className="text-gray-600 text-sm text-center">
-            Don't have an account?{" "}
-            <span
-              onClick={() => (window.location.href = "/signup")}
-              className="text-blue-600 hover:text-blue-700 hover:underline font-semibold cursor-pointer transition-colors"
-            >
-              Sign up for free
-            </span>
-          </p>
         </div>
-        
-        {/* Additional Info */}
-        <p className="text-center text-gray-500 text-sm mt-6">
-          Protected by industry-standard encryption
-        </p>
+    
       </div>
       
       <style>{`
