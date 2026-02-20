@@ -27,7 +27,7 @@ const ForgotPasswordPage: React.FC = () => {
     const result = forgotPasswordSchema.safeParse({ email });
     
     if (!result.success) {
-      const emailErr = result.error.errors.find((e) => e.path[0] === "email");
+      const emailErr = result.error.issues.find((issue) => issue.path[0] === "email");
       if (emailErr) {
         setEmailError(emailErr.message);
       }

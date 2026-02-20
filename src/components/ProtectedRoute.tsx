@@ -8,6 +8,7 @@ interface ProtectedRouteProps {
 }
 
 function ProtectedRoute({ children, role }: ProtectedRouteProps) {
+  void role;
   const { isAuthenticated, isLoading } = useAuthContext();
   const navigate = useNavigate();
 

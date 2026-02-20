@@ -2,10 +2,17 @@ import { MdOutlineDelete, MdOutlineRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router";
 import api from "../../../config/axios.config";
 import { toast } from "react-toastify";
+import type { ICellRendererParams } from "ag-grid-community";
+import type { IStudent } from "../../../@types/interface/student.interface";
 
-function StudentActionCellRenderer({ params }) {
+function StudentActionCellRenderer({
+  params,
+}: {
+  params: ICellRendererParams<IStudent>;
+}) {
   const navigate = useNavigate();
   const { data, api:gridApi } = params;
+  if (!data) return null;
   const handlePreviewClick = () => {
     navigate(`/students/${data.student_id}`);
   };

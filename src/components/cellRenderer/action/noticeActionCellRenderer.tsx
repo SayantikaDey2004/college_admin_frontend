@@ -2,10 +2,17 @@ import { MdOutlineDelete, MdOutlineRemoveRedEye } from "react-icons/md";
 import { useNavigate } from "react-router";
 import api from "../../../config/axios.config";
 import { toast } from "react-toastify";
+import type { ICellRendererParams } from "ag-grid-community";
+import type { INotice } from "../../../@types/interface/notice.interface";
 
-function NoticeActionCellRenderer({ params }) {
+function NoticeActionCellRenderer({
+  params,
+}: {
+  params: ICellRendererParams<INotice>;
+}) {
   const navigate = useNavigate();
   const { data, api:gridApi } = params;
+  if (!data) return null;
   const handlePreviewClick = () => {
     navigate(`/notices/${data.notice_id}`);
   };

@@ -3,10 +3,17 @@ import { useNavigate } from "react-router";
 import api from "../../../config/axios.config";
 import { toast } from "react-toastify";
 import { TbLockCheck } from "react-icons/tb";
+import type { ICellRendererParams } from "ag-grid-community";
+import type { IFaculty } from "../../../@types/interface/faculty.interface";
 
-function FacultyActionCellRenderer({ params }) {
+function FacultyActionCellRenderer({
+  params,
+}: {
+  params: ICellRendererParams<IFaculty>;
+}) {
   const navigate = useNavigate();
   const { data, api:gridApi } = params;
+  if (!data) return null;
   const handlePreviewClick = () => {
     navigate(`/faculty/${data.faculty_id}`);
   };

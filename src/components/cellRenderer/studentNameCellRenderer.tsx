@@ -1,9 +1,11 @@
 import { IoPersonOutline } from "react-icons/io5";
 import getFullName from "../../utils/getFullName";
 import { Link } from "react-router";
+import type { IStudent } from "../../@types/interface/student.interface";
 
-function StudentNameCellRenderer({data}) {
+function StudentNameCellRenderer({ data }: { data?: IStudent }) {
   console.log(data);
+  if (!data) return null;
   const fullName = getFullName(
     data.first_name,
     data.last_name,

@@ -2,10 +2,17 @@ import api from "../../../config/axios.config";
 import { toast } from "react-toastify";
 import { MdOutlineRemoveRedEye, MdOutlineDelete } from "react-icons/md";
 import { useNavigate } from "react-router";
+import type { ICellRendererParams } from "ag-grid-community";
+import type { IEvent } from "../../../@types/interface/event.interface";
 
-function EventActionCellRenderer({ params }) {
+function EventActionCellRenderer({
+  params,
+}: {
+  params: ICellRendererParams<IEvent>;
+}) {
   const navigate = useNavigate();
   const { data, api: gridApi } = params;
+  if (!data) return null;
     const handlePreviewClick = () => {
       navigate(`/events/${data.event_id}`);
     };

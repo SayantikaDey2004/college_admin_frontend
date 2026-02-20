@@ -4,6 +4,7 @@ import { MdEmail, MdLock } from "react-icons/md";
 import api from "../../config/axios.config";
 import { useAuthContext } from "../../context/auth/useAuthContext";
 import { Link, useNavigate } from "react-router";
+import { loginSchema } from "../../validations/auth.validation";
 
 const LoginPage: React.FC = () => {
   const { onLogin, isAuthenticated } = useAuthContext();
@@ -35,6 +36,13 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    const validationResult = loginSchema.safeParse({ email, password });
+    if (!validationResult.success) {
+      setError(validationResult.error.issues[0]?.message || "Invalid input");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await api.post("/auth/login", { email, password });
@@ -114,7 +122,7 @@ const LoginPage: React.FC = () => {
             </div>
           )}
           
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form className="space-y-5" noValidate onSubmit={handleSubmit}>
             {/* Email */}
             <div className="transform transition-all duration-300 hover:translate-x-1">
               <label
@@ -129,7 +137,6 @@ const LoginPage: React.FC = () => {
                   id="email"
                   name="email"
                   type="email"
-                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your.email@example.com"
@@ -152,7 +159,6 @@ const LoginPage: React.FC = () => {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"

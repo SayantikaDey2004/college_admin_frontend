@@ -73,9 +73,11 @@ const ResetPasswordPage: React.FC = () => {
     const result = resetPasswordSchema.safeParse({ password, confirmPassword });
 
     if (!result.success) {
-      const passwordErr = result.error.errors.find((e) => e.path[0] === "password");
-      const confirmPasswordErr = result.error.errors.find(
-        (e) => e.path[0] === "confirmPassword"
+      const passwordErr = result.error.issues.find(
+        (issue) => issue.path[0] === "password",
+      );
+      const confirmPasswordErr = result.error.issues.find(
+        (issue) => issue.path[0] === "confirmPassword",
       );
 
       if (passwordErr) {

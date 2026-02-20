@@ -22,6 +22,7 @@ import SettingsPage from "../pages/settings/settings.page";
 import PermissionPage from "../pages/permission/permission.page";
 import ForgotPasswordPage from "../pages/auth/forgot_password";
 import ResetPasswordPage from "../pages/auth/reset_password";
+import DashboardPage from "../pages/dashboard/dashboard.page";
 
 
 
@@ -38,10 +39,10 @@ const Router = createBrowserRouter([
       />
     ),
     children: [
-   /*   {
-        path: "dashboard", 
+      {
+        path: "dashboard",
         element: <DashboardPage />,
-      },*/
+      },
       {
         path: "faculty",
         children: [
