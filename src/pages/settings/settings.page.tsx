@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FiLock, FiBell, FiArrowLeft } from "react-icons/fi";
+import { FiLock, FiArrowLeft } from "react-icons/fi";
 import useDashboardContext from "../../context/dashboard/useDashboardContext";
 import { Link } from "react-router";
 import SecuritySettings from "../../components/settings/SecuritySettings";
@@ -7,7 +7,7 @@ import AlertMessage from "../../components/settings/AlertMessage";
 
 const SettingsPage: React.FC = () => {
   const { setPageName } = useDashboardContext();
-  const [activeTab, setActiveTab] = useState<"security" | "notifications">(
+  const [activeTab, setActiveTab] = useState<"security">(
     "security",
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -77,7 +77,7 @@ const SettingsPage: React.FC = () => {
                 <FiLock size={18} />
                 Security
               </button>
-              <button
+              {/* <button
                 onClick={() => setActiveTab("notifications")}
                 className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors duration-200 ${
                   activeTab === "notifications"
@@ -87,7 +87,7 @@ const SettingsPage: React.FC = () => {
               >
                 <FiBell size={18} />
                 Notifications
-              </button>
+              </button> */}
             </div>
           </div>
 
