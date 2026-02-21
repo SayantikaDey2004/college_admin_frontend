@@ -27,7 +27,7 @@ function FacultyActionCellRenderer({
 
 
     try {
-      const response = await api.delete(`/faculty/${data.faculty_id}`);
+      const response = await api.delete(`/faculty/${data.faculty_id}?type=soft`);
       if (response.status === 200) {
         toast("Faculty deleted successfully", { type: "success" });
         gridApi.applyTransaction({ remove: [data] });
