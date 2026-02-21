@@ -10,7 +10,6 @@ import {
   FiAward,
   FiShield,
   FiLogOut,
-  FiEdit,
   FiArrowLeft,
 } from "react-icons/fi";
 import { useAuthContext } from "../../context/auth/useAuthContext";
@@ -82,10 +81,10 @@ const MyProfilePage: React.FC = () => {
             <FiArrowLeft className="w-5 h-5" />
             <span className="font-medium">Back to Dashboard</span>
           </Link>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md">
+          {/* <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md">
             <FiEdit className="w-4 h-4" />
             Edit Profile
-          </button>
+          </button> */}
         </div>
 
         {/* Profile Header Card */}
