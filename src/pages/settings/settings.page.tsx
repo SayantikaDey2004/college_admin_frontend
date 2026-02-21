@@ -3,7 +3,6 @@ import { FiLock, FiBell, FiArrowLeft } from "react-icons/fi";
 import useDashboardContext from "../../context/dashboard/useDashboardContext";
 import { Link } from "react-router";
 import SecuritySettings from "../../components/settings/SecuritySettings";
-import NotificationSettings from "../../components/settings/NotificationSettings";
 import AlertMessage from "../../components/settings/AlertMessage";
 
 const SettingsPage: React.FC = () => {
@@ -105,14 +104,14 @@ const SettingsPage: React.FC = () => {
             )}
 
             {/* Notification Settings */}
-            {activeTab === "notifications" && (
+            {/* {activeTab === "notifications" && (
               <NotificationSettings
                 onSuccess={handleSuccess}
                 onError={handleError}
                 isLoading={isLoading}
                 setIsLoading={setIsLoading}
               />
-            )}
+            )} */}
           </div>
         </div>
       </div>
