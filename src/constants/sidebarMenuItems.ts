@@ -1,5 +1,4 @@
 import {
-  MdCall,
   MdOutlineChat,
   MdOutlineDashboard,
   MdOutlineEvent,
@@ -83,12 +82,12 @@ const sidebarMenuItems = [
       },
     ],
   },
-  {
+  /*{
     title: "Contact Us",
     icon:MdCall,
     path: "/contact-us",
     children:[],
-  },
+  },*/
 ];
 
 export default sidebarMenuItems;

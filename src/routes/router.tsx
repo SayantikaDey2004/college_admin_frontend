@@ -16,7 +16,6 @@ import StudentPreview from "../pages/student/preview/studentPreview.page";
 import ProtectedRoute from "../components/ProtectedRoute";
 import NotFoundPage from "../pages/others/404";
 import DashboardProvider from "../context/dashboard/dashboard.provider";
-import ContactUsPage from "../pages/contact/contactUs.page";
 import MyProfilePage from "../pages/profile/profile.page";
 import SettingsPage from "../pages/settings/settings.page";
 import PermissionPage from "../pages/permission/permission.page";
@@ -115,15 +114,15 @@ const Router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "contact-us",
-        children: [
-          {
-            path: "/contact-us",
-            element: <ContactUsPage />,
-          },
-        ],
-      },
+      // /*{
+      //   path: "contact-us",
+      //   children: [
+      //     {
+      //       path: "/contact-us",
+      //       element: <ContactUsPage />,
+      //     },
+      //   ],
+      // },*/
       {
         path: "/profile",
         element: <MyProfilePage />,
